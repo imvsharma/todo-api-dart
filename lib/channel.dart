@@ -31,6 +31,7 @@ class TodoApisChannel extends ApplicationChannel {
     router
       .route("/example")
       .linkFunction((request) async {
+        print(request);
         return Response.ok({"key": "value"});
       });
 
