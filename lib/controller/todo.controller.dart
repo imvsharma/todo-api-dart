@@ -17,5 +17,15 @@ class TodoController extends ResourceController {
     return Response.ok('Task added');
   }
 
+  @Operation.put('id')
+  Future<Response> updateTodo() async {
+    return Response.ok('Task updated');
+  }
+
+  @Operation.delete('id')
+  Future<Response> deleteTodo() async {
+    return Response.ok('Task deleted');
+  }
+
   
 }

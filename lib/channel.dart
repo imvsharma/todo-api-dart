@@ -47,6 +47,7 @@ class TodoApisChannel extends ApplicationChannel {
     router
       .route('/todo/[:id]')
       .link(() => TodoController());
+    
 
     return router;
   }
