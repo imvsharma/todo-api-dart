@@ -1,4 +1,5 @@
 import 'todo_apis.dart';
+import './controller/todo.controller.dart';
 
 /// This type initializes an application.
 ///
@@ -34,6 +35,9 @@ class TodoApisChannel extends ApplicationChannel {
         print(request);
         return Response.ok({"key": "value"});
       });
+
+    router
+      .route('/books').link(() => TodoController());
 
     return router;
   }
