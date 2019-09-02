@@ -14,29 +14,39 @@ class TodoController extends ResourceController {
 
   @Operation.get('id')
   Future<Response> getBookById() async {
-    return Response.ok(['Create UI Screen']);
+    final int todoId = int.parse(request.path.variables['id']);
+    final query = Query<Todo>(context)..where((t) => t.id).equalTo(todoId);
+    return Response.ok(await query.fetch());
   }
 
   @Operation.post()
-  Future<Response> addTodo() async {
-    final Map<String, dynamic> body = await request.body.decode();
-    final query = Query<Todo>(context)
-      ..values.title = body['title'] as String
-      ..values.description = body['description'] as String;
-    
+  Future<Response> addTodo(@Bind.body() Todo body) async {
+    final query = Query<Todo>(context)..values = body;
     final insertedTodo = await query.insert();
-
     return Response.ok(insertedTodo);
   }
 
   @Operation.put('id')
-  Future<Response> updateTodo() async {
-    return Response.ok('Task updated');
+  Future<Response> updateTodo(@Bind.path('id') int id, @Bind.body() Todo body) async {
+    final query = Query<Todo>(context)
+      ..values = body
+      ..where((todo) => todo.id).equalTo(id);
+    final updateTodo = await query.updateOne();
+    if (updateTodo == null) {
+      return Response.notFound(body: 'Task does not exist');
+    }
+    return Response.ok(updateTodo);
   }
 
   @Operation.delete('id')
-  Future<Response> deleteTodo() async {
-    return Response.ok('Task deleted');
+  Future<Response> deleteTodo(@Bind.path('id') int id) async {
+    final query = Query<Todo>(context)
+      ..where((todo) => todo.id).equalTo(id);
+    final deleteTodo = await query.delete();
+    if (deleteTodo == 0) {
+      return Response.notFound(body: 'Task does not exist');
+    }
+    return Response.ok(deleteTodo);
   }
 
   
