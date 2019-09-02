@@ -8,7 +8,8 @@ class TodoController extends ResourceController {
   ManagedContext context;
   @Operation.get()
   Future<Response> getAllBooks() async {
-    return Response.ok(['Create UI Screen', 'Add the logic', 'Add angular functionality']);
+    final query = Query<Todo>(context);
+    return Response.ok(await query.fetch());
   }
 
   @Operation.get('id')
