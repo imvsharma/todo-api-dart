@@ -1,7 +1,11 @@
+
+import '../model/todo.dart';
+
 import '../todo_apis.dart';
 
 class TodoController extends ResourceController {
-
+  TodoController(this.context);
+  ManagedContext context;
   @Operation.get()
   Future<Response> getAllBooks() async {
     return Response.ok(['Create UI Screen', 'Add the logic', 'Add angular functionality']);
@@ -14,7 +18,14 @@ class TodoController extends ResourceController {
 
   @Operation.post()
   Future<Response> addTodo() async {
-    return Response.ok('Task added');
+    final Map<String, dynamic> body = await request.body.decode();
+    final query = Query<Todo>(context)
+      ..values.title = body['title'] as String
+      ..values.description = body['description'] as String;
+    
+    final insertedTodo = await query.insert();
+
+    return Response.ok(insertedTodo);
   }
 
   @Operation.put('id')
