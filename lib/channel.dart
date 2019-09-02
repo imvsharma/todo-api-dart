@@ -37,7 +37,16 @@ class TodoApisChannel extends ApplicationChannel {
       });
 
     router
-      .route('/books').link(() => TodoController());
+      .route('/todos')
+      .link(() => TodoController());
+    
+    router
+      .route('/addtodo')
+      .link(() => TodoController());
+
+    router
+      .route('/todo/[:id]')
+      .link(() => TodoController());
 
     return router;
   }
