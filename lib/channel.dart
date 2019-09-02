@@ -1,11 +1,23 @@
+
+
+
 import './controller/todo.controller.dart';
+import './utils//utils.dart';
 import 'todo_apis.dart';
+
+
+class TodoConfiguration extends Configuration {
+  TodoConfiguration(String path) : super.fromFile(File(path));
+  DatabaseConfiguration database;
+}
+
 /// This type initializes an application.
 ///
 /// Override methods in this class to set up routes and initialize services like
 /// database connections. See http://aqueduct.io/docs/http/channel/.
 class TodoApisChannel extends ApplicationChannel {
   ManagedContext context;
+  
   /// Initialize services in this method.
   ///
   /// Implement this method to initialize services, read values from [options]
@@ -15,17 +27,22 @@ class TodoApisChannel extends ApplicationChannel {
   @override
   Future prepare() async {
     logger.onRecord.listen((rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+    final config = TodoConfiguration(options.configurationFilePath);
     final dataModel = ManagedDataModel.fromCurrentMirrorSystem();
-    final psc = PostgreSQLPersistentStore.fromConnectionInfo('dartuser', 'admin', 'localhost', 5432, 'todo');
+    final psc = PostgreSQLPersistentStore.fromConnectionInfo(
+      config.database.username,
+      config.database.password,
+      config.database.host,
+      config.database.port,
+      config.database.databaseName);
     context = ManagedContext(dataModel, psc);
   }
 
   
-  Future createDatabaseSchema(ManagedContext context) async {
-    final builder = SchemaBuilder.toSchema(context.persistentStore, Schema.fromDataModel(context.dataModel), isTemporary: false);
-    for (var cmd in builder.commands) {
-      await context.persistentStore.execute(cmd);
-    }
+  
+  Future willOpen() async {
+    final config = TodoConfiguration(options.configurationFilePath);
+    await createDatabaseSchema(context, config.database.isTemporary);
   }
 
   /// Construct the request channel.
